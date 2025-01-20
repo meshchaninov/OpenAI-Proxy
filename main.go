@@ -1,7 +1,7 @@
 package main
 
 import (
-	"io"
+	"bufio"
 	"log"
 	"net/http"
 )
@@ -21,9 +21,7 @@ func main() {
 
 		req.Header = r.Header
 
-		client := &http.Client{
-			Transport: &http.Transport{},
-		}
+		client := &http.Client{}
 		resp, err := client.Do(req)
 		if err != nil {
 			log.Printf("Error reaching OpenAI API: %v", err)
@@ -38,9 +36,21 @@ func main() {
 
 		w.WriteHeader(resp.StatusCode)
 
-		_, err = io.Copy(w, resp.Body)
-		if err != nil {
-			log.Printf("Error while streaming response: %v", err)
+		reader := bufio.NewReader(resp.Body)
+		flusher, ok := w.(http.Flusher)
+		if !ok {
+			log.Println("Unable to cast response writer to Flusher")
+			http.Error(w, "Streaming unsupported!", http.StatusInternalServerError)
+			return
+		}
+
+		for {
+			line, err := reader.ReadBytes('\n')
+			if err != nil {
+				break
+			}
+			w.Write(line)
+			flusher.Flush()
 		}
 
 		log.Printf("Completed request with status code: %d", resp.StatusCode)
