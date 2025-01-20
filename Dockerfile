@@ -15,6 +15,4 @@ COPY --from=builder /app/proxy-server .
 
 EXPOSE 8080
 
-ENV OPENAI_API_KEY "<REQUIRED>"
-
 CMD ["./proxy-server"]
