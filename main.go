@@ -10,7 +10,7 @@ func main() {
 	apiURL := "https://api.openai.com"
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Received request: %s %s", r.Method, r.URL.Path)
+		log.Printf("Received request: %s %s %s", r.Method, r.URL.Path, r.RemoteAddr)
 
 		req, err := http.NewRequest(r.Method, apiURL+r.URL.Path, r.Body)
 		if err != nil {
