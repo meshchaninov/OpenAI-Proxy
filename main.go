@@ -21,7 +21,9 @@ func main() {
 
 		req.Header = r.Header
 
-		client := &http.Client{}
+		client := &http.Client{
+			Transport: &http.Transport{},
+		}
 		resp, err := client.Do(req)
 		if err != nil {
 			log.Printf("Error reaching OpenAI API: %v", err)
@@ -35,9 +37,13 @@ func main() {
 		}
 
 		w.WriteHeader(resp.StatusCode)
-		io.Copy(w, resp.Body)
 
-		log.Printf("Responded with status code: %d", resp.StatusCode)
+		_, err = io.Copy(w, resp.Body)
+		if err != nil {
+			log.Printf("Error while streaming response: %v", err)
+		}
+
+		log.Printf("Completed request with status code: %d", resp.StatusCode)
 	})
 
 	port := "8080"
