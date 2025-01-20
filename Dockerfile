@@ -1,10 +1,8 @@
-FROM golang:1.23.1 AS builder
+FROM golang:1.23.1-alpine AS builder
 
 WORKDIR /app
 
 COPY . .
-
-RUN go mod download
 RUN go build -o proxy-server
 
 FROM alpine:latest
