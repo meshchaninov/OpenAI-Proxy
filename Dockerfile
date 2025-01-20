@@ -1,4 +1,4 @@
-FROM golang:1.23.1-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 WORKDIR /app
 
@@ -14,5 +14,7 @@ WORKDIR /root/
 COPY --from=builder /app/proxy-server .
 
 EXPOSE 8080
+
+ENV OPENAI_API_KEY "<REQUIRED>"
 
 CMD ["./proxy-server"]
